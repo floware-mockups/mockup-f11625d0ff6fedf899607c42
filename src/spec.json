@@ -1,0 +1,428 @@
+{
+  "title": "Confronto impegni del Comune di Rovigo",
+  "description": "Comune di Borgoverde (inventato) · Livello 4 del cruscotto dell'ufficio: la determina di affidamento diretto con controlli, soglie e importi in lettere.",
+  "accent": "indigo",
+  "pages": [
+    {
+      "id": "determina",
+      "title": "Determina di affidamento diretto",
+      "description": "Scegli una pratica di esempio o compila i campi. I controlli e il riepilogo si aggiornano mentre scrivi; «Genera la determina» si attiva quando non ci sono errori.",
+      "metrics": [],
+      "columns": [],
+      "rows": [],
+      "form": [],
+      "kind": "document",
+      "document": {
+        "fields": [
+          {
+            "key": "tipologia",
+            "label": "Tipologia",
+            "type": "choice",
+            "required": true,
+            "options": [
+              "forniture",
+              "servizi",
+              "lavori"
+            ]
+          },
+          {
+            "key": "oggetto",
+            "label": "Descrizione della fornitura",
+            "type": "text",
+            "required": true
+          },
+          {
+            "key": "fornitore",
+            "label": "Fornitore",
+            "type": "text",
+            "required": true
+          },
+          {
+            "key": "partita_iva",
+            "label": "Partita IVA",
+            "type": "text",
+            "required": true,
+            "digits": 11
+          },
+          {
+            "key": "importo",
+            "label": "Importo netto in euro",
+            "type": "number",
+            "required": true,
+            "positive": true
+          },
+          {
+            "key": "sconto",
+            "label": "Sconto in percentuale",
+            "type": "percent",
+            "default": "0",
+            "min": 0,
+            "max": 99
+          },
+          {
+            "key": "capitolo",
+            "label": "Capitolo",
+            "type": "text",
+            "required": true
+          },
+          {
+            "key": "cig",
+            "label": "Codice identificativo di gara",
+            "type": "text",
+            "required": true,
+            "length": 10
+          },
+          {
+            "key": "rup",
+            "label": "Responsabile del procedimento",
+            "type": "text",
+            "required": true
+          },
+          {
+            "key": "responsabile",
+            "label": "Responsabile di Area",
+            "type": "text",
+            "required": true
+          },
+          {
+            "key": "motivazione",
+            "label": "Motivazione",
+            "type": "long",
+            "ai": true,
+            "fallback": "La fornitura è necessaria per il funzionamento dell'ufficio"
+          }
+        ],
+        "summary": {
+          "amount": "importo",
+          "discount": "sconto",
+          "vat": 22
+        },
+        "rules": [
+          {
+            "type": "threshold",
+            "value": "netto",
+            "atLeast": 140000,
+            "when": {
+              "field": "tipologia",
+              "in": [
+                "forniture",
+                "servizi"
+              ]
+            },
+            "level": "error",
+            "message": "Serve una procedura diversa: per forniture e servizi l'affidamento diretto è ammesso sotto i 140.000 euro (articolo 50, comma 1, lettera b), del decreto legislativo 31 marzo 2023, n. 36)."
+          },
+          {
+            "type": "threshold",
+            "value": "netto",
+            "atLeast": 150000,
+            "when": {
+              "field": "tipologia",
+              "in": [
+                "lavori"
+              ]
+            },
+            "level": "error",
+            "message": "Serve una procedura diversa: per i lavori l'affidamento diretto è ammesso sotto i 150.000 euro (articolo 50, comma 1, lettera a), del decreto legislativo 31 marzo 2023, n. 36)."
+          },
+          {
+            "type": "threshold",
+            "value": "netto",
+            "atLeast": 5000,
+            "level": "warning",
+            "message": "Importo pari o superiore a 5.000 euro: verifica la procedura applicabile e gli adempimenti previsti."
+          },
+          {
+            "type": "different",
+            "fields": [
+              "rup",
+              "responsabile"
+            ],
+            "level": "warning",
+            "message": "Il responsabile del procedimento coincide con il Responsabile di Area: verifica che sia una scelta voluta."
+          }
+        ],
+        "maps": [
+          {
+            "key": "area",
+            "from": "tipologia",
+            "values": {
+              "lavori": "Tecnica"
+            },
+            "otherwise": "Amministrativa"
+          },
+          {
+            "key": "lettera",
+            "from": "tipologia",
+            "values": {
+              "lavori": "a)"
+            },
+            "otherwise": "b)"
+          },
+          {
+            "key": "prestazione",
+            "from": "tipologia",
+            "values": {
+              "forniture": "la fornitura",
+              "servizi": "il servizio",
+              "lavori": "i lavori"
+            },
+            "otherwise": "la prestazione"
+          }
+        ],
+        "template": "COMUNE DI BORGOVERDE\nArea {area}\n\nDETERMINAZIONE N. {numero}/{anno}\n\nOGGETTO: {oggetto|maiuscolo}. AFFIDAMENTO DIRETTO A {fornitore|maiuscolo}. CODICE IDENTIFICATIVO DI GARA {cig|maiuscolo}.\n\nIL RESPONSABILE DI AREA\n\nVisti:\n- l'articolo 107 del decreto legislativo 18 agosto 2000, n. 267, sulle competenze dei dirigenti e dei responsabili;\n- l'articolo 183 del decreto legislativo 18 agosto 2000, n. 267, sull'impegno di spesa;\n- l'articolo 50, comma 1, lettera {lettera}, del decreto legislativo 31 marzo 2023, n. 36, sull'affidamento diretto;\n- il decreto sindacale di nomina del sottoscritto quale Responsabile di Area;\n\nPremesso che:\n{motivazione}\n\nDato atto che:\n- il responsabile del procedimento è {rup};\n- non sussistono situazioni di conflitto di interessi, anche potenziale, in capo al responsabile del procedimento e al sottoscritto;\n- la spesa trova copertura sul capitolo {capitolo} del bilancio di previsione in corso;\n\nDETERMINA\n\n1. di affidare a {fornitore}, partita IVA {partita_iva}, {prestazione} di cui in oggetto, per l'importo di {netto} oltre IVA al {aliquota}% di {iva}, per complessivi {totale} ({totale_lettere}){?sconto}, al netto dello sconto del {sconto}%{/sconto};\n2. di impegnare la somma di {totale} sul capitolo {capitolo} del bilancio di previsione in corso;\n3. di pubblicare il presente atto nella sezione Amministrazione trasparente, ai sensi del decreto legislativo 14 marzo 2013, n. 33, e del decreto legislativo 31 marzo 2023, n. 36.\n\nIl Responsabile di Area\n{responsabile}\n\nSi dà atto che il presente provvedimento sarà pubblicato all'albo",
+        "generateLabel": "Crea la determina",
+        "aiFields": [
+          "tipologia",
+          "oggetto",
+          "fornitore"
+        ],
+        "examples": [
+          {
+            "label": "Arredi biblioteca",
+            "values": {
+              "tipologia": "forniture",
+              "oggetto": "Fornitura di arredi per la biblioteca comunale",
+              "fornitore": "Bianchi Arredi Srl",
+              "partita_iva": "01234567890",
+              "importo": "4.800",
+              "sconto": "0",
+              "capitolo": "2030",
+              "cig": "B1A2C3D4E5",
+              "rup": "Laura Conti",
+              "responsabile": "Marco Verdi",
+              "motivazione": ""
+            }
+          },
+          {
+            "label": "Manutenzione verde",
+            "values": {
+              "tipologia": "servizi",
+              "oggetto": "Servizio di manutenzione del verde pubblico per l'anno 2027",
+              "fornitore": "Verde Pubblico Coop",
+              "partita_iva": "0987654321",
+              "importo": "38.000",
+              "sconto": "0",
+              "capitolo": "1090",
+              "cig": "B9Z8Y7X6W5",
+              "rup": "Paolo Marino",
+              "responsabile": "Paolo Marino",
+              "motivazione": ""
+            }
+          },
+          {
+            "label": "Servizio di pulizia",
+            "values": {
+              "tipologia": "servizi",
+              "oggetto": "Servizio di pulizia degli edifici comunali per il biennio 2027-2028",
+              "fornitore": "Pulito Spa",
+              "partita_iva": "11223344556",
+              "importo": "145.000",
+              "sconto": "0",
+              "capitolo": "1070",
+              "cig": "",
+              "rup": "Sara Gallo",
+              "responsabile": "Marco Verdi",
+              "motivazione": ""
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "abbattimento-albero",
+      "title": "Abbattimento di un albero pericolante",
+      "description": "Una determina vera, adattata al Comune inventato di Borgoverde: affidamento diretto sotto i 5.000 euro fuori dal Mercato elettronico. Compila operatore economico, sede, prezzo e codice di gara: il testo si aggiorna da solo.",
+      "metrics": [],
+      "columns": [],
+      "rows": [],
+      "form": [],
+      "kind": "document",
+      "document": {
+        "fields": [
+          {
+            "key": "tipologia",
+            "label": "Tipologia",
+            "type": "choice",
+            "required": true,
+            "options": [
+              "servizi"
+            ],
+            "default": "servizi"
+          },
+          {
+            "key": "oggetto",
+            "label": "Oggetto del servizio",
+            "type": "text",
+            "required": true
+          },
+          {
+            "key": "operatore",
+            "label": "Operatore economico",
+            "type": "text",
+            "required": true
+          },
+          {
+            "key": "sede",
+            "label": "Sede (comune)",
+            "type": "text",
+            "required": true
+          },
+          {
+            "key": "via",
+            "label": "Via",
+            "type": "text",
+            "required": true
+          },
+          {
+            "key": "civico",
+            "label": "Numero civico",
+            "type": "text",
+            "required": true
+          },
+          {
+            "key": "partita_iva",
+            "label": "Codice fiscale e partita IVA",
+            "type": "text",
+            "required": true,
+            "digits": 11
+          },
+          {
+            "key": "importo",
+            "label": "Prezzo netto in euro",
+            "type": "number",
+            "required": true,
+            "positive": true
+          },
+          {
+            "key": "capitolo",
+            "label": "Capitolo",
+            "type": "text",
+            "required": true
+          },
+          {
+            "key": "cig",
+            "label": "Codice identificativo di gara",
+            "type": "text",
+            "required": true,
+            "length": 10
+          },
+          {
+            "key": "responsabile",
+            "label": "Responsabile di Area",
+            "type": "text",
+            "required": true
+          },
+          {
+            "key": "motivazione",
+            "label": "Motivazione («considerato che»)",
+            "type": "long",
+            "ai": true,
+            "fallback": "in seguito al fortunale dei giorni scorsi è necessario intervenire rapidamente con l'abbattimento dell'albero, che versa in gravi condizioni di pericolo perché le radici sono state danneggiate e la stabilità della pianta è compromessa;"
+          }
+        ],
+        "summary": {
+          "amount": "importo",
+          "vat": 22
+        },
+        "rules": [
+          {
+            "type": "threshold",
+            "value": "netto",
+            "atLeast": 5000,
+            "level": "error",
+            "message": "Serve una procedura diversa: questo modello vale per gli affidamenti diretti sotto i 5.000 euro, fuori dal Mercato elettronico della pubblica amministrazione."
+          }
+        ],
+        "template": "COMUNE DI BORGOVERDE\nArea Tecnica\n\nDETERMINAZIONE N. {numero}/{anno}\n\nOGGETTO: {oggetto|maiuscolo}. AFFIDAMENTO DIRETTO A {operatore|maiuscolo}. CODICE IDENTIFICATIVO DI GARA {cig|maiuscolo}.\n\nIL RESPONSABILE DI AREA\n\nPREMESSO che:\n- con deliberazione n. 48 del 16 dicembre 2025 il Consiglio comunale ha approvato il Documento unico di programmazione 2026-2028, che nell'obiettivo strategico «Urbanistica e lavori pubblici» prevede l'obiettivo operativo n. 12 «Garantire la manutenzione ordinaria e straordinaria delle strade»;\n- con deliberazione n. 49 del 16 dicembre 2025 il Consiglio comunale ha approvato il bilancio di previsione 2026-2028;\n- con deliberazione n. 3 del 20 gennaio 2026 la Giunta comunale ha approvato il Piano esecutivo di gestione 2026-2028 e assegnato ai Responsabili di Area le risorse umane, finanziarie e strumentali;\n- con deliberazione n. 15 del 17 marzo 2026 la Giunta comunale ha approvato il Piano integrato di attività e organizzazione 2026-2028;\n- l'articolo 13 del decreto legislativo 18 agosto 2000, n. 267, recante il «Testo unico delle leggi sull'ordinamento degli enti locali», attribuisce al Comune le funzioni amministrative che riguardano la popolazione e il territorio comunale;\n\nCONSIDERATO che {motivazione}\n\nDATO ATTO che il valore complessivo dell'appalto è stimabile in {netto};\n\nVISTO l'articolo 192 del decreto legislativo 18 agosto 2000, n. 267, secondo il quale la stipulazione dei contratti deve essere preceduta da una determinazione del responsabile del procedimento di spesa che indichi il fine del contratto, il suo oggetto, la forma, le clausole essenziali e le modalità di scelta del contraente;\n\nVISTO il decreto legislativo 31 marzo 2023, n. 36, recante il «Codice dei contratti pubblici», e in particolare:\n- gli articoli da 1 a 12, che enunciano i principi generali, tra cui il principio del risultato e il principio della fiducia;\n- gli articoli 7, comma 1, e 8, comma 1, sull'organizzazione autonoma delle prestazioni e sull'autonomia contrattuale delle pubbliche amministrazioni;\n- l'articolo 15, insieme all'allegato I.2, sull'individuazione del Responsabile unico del progetto;\n- l'articolo 17, che prevede, nel caso di affidamento diretto, l'individuazione dell'oggetto, dell'importo e del contraente, con le ragioni della scelta e i requisiti richiesti;\n- l'articolo 18, comma 10, e l'allegato I.4, che esentano dall'imposta di bollo gli affidamenti di importo inferiore a 40.000 euro;\n\nATTESO che l'articolo 50, comma 1, del «Codice dei contratti pubblici» consente l'affidamento diretto dei servizi e delle forniture di importo inferiore a 140.000 euro, anche senza consultazione di più operatori economici, scegliendo soggetti con documentate esperienze pregresse idonee all'esecuzione delle prestazioni;\n\nVISTI altresì:\n- l'articolo 52 del «Codice dei contratti pubblici», secondo il quale negli affidamenti diretti di importo inferiore a 40.000 euro gli operatori economici attestano il possesso dei requisiti con dichiarazione sostitutiva di atto di notorietà, verificata dalla stazione appaltante anche a campione;\n- l'articolo 62, comma 1, che consente a tutte le stazioni appaltanti di acquisire direttamente forniture e servizi di importo non superiore alle soglie degli affidamenti diretti;\n\nCONSIDERATO che l'oggetto dell'appalto non riguarda categorie merceologiche per le quali è obbligatorio il ricorso al Mercato elettronico della pubblica amministrazione e che l'affidamento è di importo inferiore a 5.000 euro, per cui si può procedere fuori dal Mercato elettronico, garantendo la digitalizzazione dell'appalto anche con la posta elettronica certificata;\n\nVISTA la nota con la quale il Presidente dell'Autorità nazionale anticorruzione ha prorogato l'utilizzo dell'interfaccia web della piattaforma dei contratti pubblici dell'Autorità per gli affidamenti diretti di importo inferiore a 5.000 euro;\n\nDATO ATTO, altresì, che per la presente procedura è stato acquisito il codice identificativo di gara {cig};\n\nVISTO il preventivo formulato dall'operatore economico {operatore}, con sede a {sede}, in via {via}, n. {civico}, che propone di eseguire la prestazione al prezzo di {netto}, oltre IVA ai sensi di legge;\n\nRITENUTA congrua l'offerta, considerate le modalità e i tempi di esecuzione dell'appalto;\n\nDATO ATTO che il sottoscritto è il Responsabile unico del progetto, ai sensi dell'articolo 15 del decreto legislativo 31 marzo 2023, n. 36;\n\nCONSIDERATO che l'operatore economico ha presentato la dichiarazione sostitutiva di atto di notorietà sul possesso dei requisiti di partecipazione e di qualificazione;\n\nVERIFICATO che l'operatore economico:\n- non presenta annotazioni riservate nel casellario informatico dell'Autorità nazionale anticorruzione;\n- è in regola con il versamento dei contributi previdenziali, come risulta dal documento unico di regolarità contributiva;\n- ha la necessaria idoneità professionale, come risulta dalla visura camerale agli atti;\n- ha un'esperienza pregressa adeguata all'esecuzione delle prestazioni;\n\nRITENUTO di ricorrere all'affidamento diretto, ai sensi dell'articolo 50, comma 1, lettera b), del decreto legislativo 31 marzo 2023, n. 36;\n\nDATO ATTO che, ai sensi dell'articolo 6-bis della legge 7 agosto 1990, n. 241, e dell'articolo 16 del decreto legislativo 31 marzo 2023, n. 36, il sottoscritto non si trova in alcuna situazione di conflitto di interessi in relazione alla procedura;\n\nVISTI gli articoli 182 e seguenti del decreto legislativo 18 agosto 2000, n. 267, che disciplinano le fasi della spesa;\n\nDATO ATTO che sussistono le condizioni per assumere l'impegno di spesa, in quanto il soggetto, la ragione del debito e la somma da pagare sono determinati, il debito è esigibile nel corrente esercizio e il capitolo di spesa presenta sufficiente disponibilità;\n\nRITENUTO di esprimere parere favorevole, ai fini del controllo preventivo di cui all'articolo 147-bis del decreto legislativo 18 agosto 2000, n. 267, sulla regolarità amministrativa del presente provvedimento;\n\nDETERMINA\n\n1. di contrarre per l'acquisizione, mediante contratto di appalto, del servizio di {oggetto};\n2. di stabilire che il fine del contratto è tutelare l'incolumità pubblica e il patrimonio pubblico e privato; che la scelta del contraente avviene con l'affidamento diretto, ai sensi dell'articolo 50, comma 1, lettera b), del decreto legislativo 31 marzo 2023, n. 36; che il contratto è sottoscritto mediante corrispondenza secondo l'uso commerciale, anche con la posta elettronica certificata, ed è esente dall'imposta di bollo in quanto sotto la soglia di 40.000 euro;\n3. di affidare il contratto all'operatore economico {operatore}, con sede a {sede}, in via {via}, n. {civico}, codice fiscale e partita IVA {partita_iva}, al prezzo di {netto} oltre IVA al {aliquota}%, pari a {iva}, per complessivi {totale} ({totale_lettere});\n4. di dare atto che la determinazione rispetta l'articolo 9, comma 1, lettera a), punto 2, del decreto-legge 1° luglio 2009, n. 78, convertito, con modificazioni, dalla legge 3 agosto 2009, n. 102, sulla tempestività dei pagamenti;\n5. di impegnare la spesa complessiva di {totale}, IVA compresa, a favore del suddetto operatore economico, imputandola all'esercizio finanziario 2026 del bilancio di previsione 2026-2028, missione 10, programma 5, titolo 1, capitolo {capitolo};\n6. di dare atto che, ai sensi dell'articolo 183, comma 8, del decreto legislativo 18 agosto 2000, n. 267, è stata accertata la compatibilità del programma dei pagamenti con gli stanziamenti di cassa e con le regole di finanza pubblica.\n\nIl Responsabile di Area\n{responsabile}",
+        "generateLabel": "Genera la determina",
+        "aiFields": [
+          "tipologia",
+          "oggetto",
+          "operatore"
+        ],
+        "examples": [
+          {
+            "label": "Abbattimento di un albero pericolante",
+            "values": {
+              "tipologia": "servizi",
+              "oggetto": "abbattimento di un albero pericolante nell'area verde di via dei Tigli",
+              "operatore": "Verde Sicuro Srl",
+              "sede": "Borgoverde",
+              "via": "delle Querce",
+              "civico": "12",
+              "partita_iva": "03456789012",
+              "importo": "3.200",
+              "capitolo": "2008",
+              "cig": "B7T4R2S9Q1",
+              "responsabile": "Marco Verdi",
+              "motivazione": ""
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "impegni-fornitore",
+      "title": "Impegni per fornitore",
+      "description": "Dati dimostrativi degli impegni e dei relativi importi.",
+      "metrics": [
+        {
+          "label": "Impegni registrati",
+          "value": "6 impegni dimostrativi."
+        },
+        {
+          "label": "Importi di esempio",
+          "value": "29.850 euro complessivi."
+        }
+      ],
+      "columns": [
+        "Fornitore",
+        "Importo",
+        "Categoria"
+      ],
+      "rows": [
+        [
+          "Arredi Laguna",
+          "4800",
+          "Forniture"
+        ],
+        [
+          "Verde Sereno",
+          "3200",
+          "Servizi"
+        ],
+        [
+          "Arredi Laguna",
+          "2150",
+          "Forniture"
+        ],
+        [
+          "Pulito Bene",
+          "8900",
+          "Servizi"
+        ],
+        [
+          "Verde Sereno",
+          "4100",
+          "Servizi"
+        ],
+        [
+          "Luce Chiara",
+          "6700",
+          "Forniture"
+        ]
+      ],
+      "form": [
+        "Fornitore",
+        "Importo",
+        "Categoria"
+      ],
+      "chartColumn": 0
+    }
+  ],
+  "theme": {
+    "palette": "verde-istituzionale",
+    "fonts": "istituzionale"
+  }
+}
